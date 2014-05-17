@@ -56,23 +56,23 @@ public class Account implements Serializable {
         LOG.entering(Account.class.getCanonicalName(), "equals");
 
         if (obj == null) {
-            LOG.exiting(Account.class.getCanonicalName(), "equals");
+            LOG.exiting(Account.class.getCanonicalName(), "equals {0}", "Object is null");
             return false;
         }
         if (getClass() != obj.getClass()) {
-            LOG.exiting(Account.class.getCanonicalName(), "equals");
+            LOG.exiting(Account.class.getCanonicalName(), "equals {0}", "Class not same");
             return false;
         }
         final Account other = (Account) obj;
         if (this.id != other.id) {
-            LOG.exiting(Account.class.getCanonicalName(), "equals");
+            LOG.exiting(Account.class.getCanonicalName(), "equals {0}", "id is not the same");
             return false;
         }
         LOG.fine("Now isn't this a fine message?");
         LOG.finer("This is a fine message you got us into");
         LOG.finest("isn't this a finest message of all?");
         LOG.info("account is the same");
-        LOG.exiting(Account.class.getCanonicalName(), "equals");
+        LOG.exiting(Account.class.getCanonicalName(), "equals", "now that is more like it, this is equals");
         return true;
     }
 
