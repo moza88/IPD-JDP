@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 
 /**
  * Generic Account class to demonstrate Java best practice
+ * Hello world
  */
 public class Account implements Serializable {
 
