@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx">
+
+	<import resource="hsql-config.xml" />	
+	<context:component-scan base-package="edu.depaul.ipd.lwjd.dao.spring"/>
+	
+	<!--  do not include transaction on the default (associated just with the transactionExample 		-->	
+	<bean id="productSelectorDAOSupport" class="edu.depaul.ipd.lwjd.dao.spring.ProductSelectorDAOSupport">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<bean id="springMapProductSelector" class="edu.depaul.ipd.lwjd.dao.spring.SpringJDBCMappingProductSelector">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="sql" value="select * from products"/>
+	</bean>
+
+	<bean id="updateExample" class="edu.depaul.ipd.lwjd.dao.spring.UpdateExample">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="sql" value="update PRODUCTS set description=? where id=?"/>
+	</bean>
+
+	<bean id="insertExample" class="edu.depaul.ipd.lwjd.dao.spring.InsertExample">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="sql" value="insert into PRODUCTS(description, price) values (?, ?)"/>
+	</bean>
+
+	<bean id="transactionManager"
+			class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+</beans>
