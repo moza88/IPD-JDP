@@ -13,10 +13,19 @@ public class DBUtility {
     private static final String IN_MEMORY_URL = "jdbc:hsqldb:mem:.";
     private static final String FILE_URL = "jdbc:hsqldb:hsql://localhost/xdb";
     
+    public static final String DB_DRIVER = "org.hsqldb.jdbcDriver";
     public static final String DB_URL = FILE_URL;
     public static final String USER_NAME = "SA";
     public static final String PASSWORD = "";
 
+    static {
+        try {
+            Class.forName(DB_DRIVER);
+        } catch (ClassNotFoundException cnfe) {
+            cnfe.printStackTrace();
+        }
+    }
+    
     public static void setupTable() {
         String connectionUrl = DB_URL;
         String userName = USER_NAME;

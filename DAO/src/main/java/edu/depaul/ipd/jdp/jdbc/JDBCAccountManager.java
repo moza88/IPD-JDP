@@ -21,7 +21,7 @@ public class JDBCAccountManager implements IAccountManager {
 
     static {
         try {
-            Class.forName("org.hsqldb.jdbcDriver");
+            Class.forName(DBUtility.DB_DRIVER);
         } catch (ClassNotFoundException cnfe) {
             cnfe.printStackTrace();
         }
