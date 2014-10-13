@@ -7,7 +7,7 @@ import javax.sql.rowset.CachedRowSet;
 public class Main {
 
     public static void main(String[] args) {
-        DBUtility.setupTable();
+   //     DBUtility.setupTable();
         JDBCAccountManager manager = new JDBCAccountManager();
         System.out.println(manager.findAccount(100));
 
@@ -18,6 +18,7 @@ public class Main {
         System.out.println("--");
         System.out.println(manager.getAllAccounts());
 
+        /*
         System.out.println("== ResultSet ===");
         ResultSet set2 = manager.getAllAccountsAsResultSet();
         try {
@@ -28,6 +29,7 @@ public class Main {
             e.printStackTrace();
         }
         System.out.println("==");
+        */
         
         System.out.println("== RowSet ===");
         CachedRowSet set = manager.getAccountsAsRowSet();
@@ -39,7 +41,6 @@ public class Main {
             e.printStackTrace();
         }
         System.out.println("==");
-
         
         
     }

@@ -1,6 +1,5 @@
 package edu.depaul.ipd.jdp.jdbc;
 
-import com.sun.rowset.CachedRowSetImpl;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -9,8 +8,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.RowSetProvider;
 
 /**
  * JDBC implementation
@@ -46,11 +47,11 @@ public class JDBCAccountManager implements IAccountManager {
             Statement stmt = con.createStatement();
 
             // Step 4:  Get the resultset from the result of executing a query
-            ResultSet rs = stmt.executeQuery("select name, balance from accounts where id=" + acctNbr);
+            ResultSet rs = stmt.executeQuery("select nm, balance from accounts where id=" + acctNbr);
 
             // Step 5:  Processing the result
             while (rs.next()) {
-                account.setName(rs.getString("name"));
+                account.setName(rs.getString("nm"));
                 account.setInitialBalance(rs.getDouble("balance"));
             }
 
@@ -79,13 +80,13 @@ public class JDBCAccountManager implements IAccountManager {
                 // Step 3:  Create a statement where the SQL statement will be provided
                 Statement stmt = con.createStatement();
                 // Step 4:  Get the resultset from the result of executing a query
-                ResultSet rs = stmt.executeQuery("select id, name, balance from accounts");) {
+                ResultSet rs = stmt.executeQuery("select id, nm, balance from accounts");) {
 
             // Step 5:  Processing the result
             while (rs.next()) {
                 Account account = new Account();
                 account.setAccountNumber(rs.getInt("id"));
-                account.setName(rs.getString("name"));
+                account.setName(rs.getString("nm"));
                 account.setInitialBalance(rs.getDouble("balance"));
                 accounts.add(account);
             }
@@ -99,6 +100,7 @@ public class JDBCAccountManager implements IAccountManager {
     /**
      * Example showing recommended post JDK7 JDBC code using try with resource
      * to let the JVM close out the connection
+     * @return 
      */
     public ResultSet getAllAccountsAsResultSet() {
         ResultSet rs = null;
@@ -108,7 +110,7 @@ public class JDBCAccountManager implements IAccountManager {
                 Connection con = getConnection();
                 // Step 3:  Create a statement where the SQL statement will be provided
                 Statement stmt = con.createStatement();
-                ResultSet rs2 = stmt.executeQuery("select id, name, balance from accounts");) {
+                ResultSet rs2 = stmt.executeQuery("select id, nm, balance from accounts");) {
             // Step 4:  Get the resultset from the result of executing a query
 
             rs = rs2;
@@ -162,47 +164,22 @@ public class JDBCAccountManager implements IAccountManager {
         }
     }
     
+    /**
+     * Sends CachedRowSet which allows for disconnected results
+     * @return 
+     */ 
     public CachedRowSet getAccountsAsRowSet() {
-        CachedRowSet crs = null;
-
-        try (
-                // Step 2:  Request a connection from the DriverManager
-                Connection con = getConnection();
-                // Step 3:  Create a statement where the SQL statement will be provided
-                Statement stmt = con.createStatement();
-                ResultSet rs2 = stmt.executeQuery("select id, name, balance from accounts");) {
-
-            // Should be able to use this using JDK 7 and above but doesn't seem to work with HSQLDB
-            // rs = RowSetProvider.newFactory().createJdbcRowSet();
-            crs = new CachedRowSetImpl();
-            crs.populate(rs2);
-        } catch (SQLException sql) {
-            throw new RuntimeException(sql);
+        CachedRowSet crs2 = null;
+        
+        try (CachedRowSet crs  = RowSetProvider.newFactory().createCachedRowSet()){
+            crs.setCommand("select id, nm, balance from accounts");
+            crs.execute(getConnection());
+            crs2 = crs;
+        } catch (SQLException ex) {
+            Logger.getLogger(JDBCAccountManager.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        return crs;
-
-    }
-
-    public CachedRowSet getAccountsAsRowSetV2() {
-        CachedRowSet crs = null;
-
-        try (
-                // Step 2:  Request a connection from the DriverManager
-                Connection con = getConnection();
-                CachedRowSet crs2 = new CachedRowSetImpl()) {
-
-            // Should be able to use this using JDK 7 and above but doesn't seem to work with HSQLDB
-            // rs = RowSetProvider.newFactory().createJdbcRowSet();
-            crs2.setCommand("select id, name, balance from accounts");
-            crs2.execute(con);
-            crs = crs2;
-
-        } catch (SQLException sql) {
-            throw new RuntimeException(sql);
-        }
-
-        return crs;
+        return crs2;
 
     }
 }
